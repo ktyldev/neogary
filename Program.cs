@@ -6,7 +6,10 @@ namespace neogary
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            new Bot()
+                .MainAsync(args)
+                .GetAwaiter()
+                .GetResult();
         }
     }
 }
