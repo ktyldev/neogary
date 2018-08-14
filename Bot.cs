@@ -2,6 +2,8 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using System.Linq;
+using Discord;
+using Discord.WebSocket;
 
 namespace neogary
 {
@@ -10,14 +12,22 @@ namespace neogary
         private const string CONFIG_PATH = "config.txt";
 
         private Config _config;
+        private DiscordSocketClient _client;
 
         public async Task MainAsync(string[] args)
         {
             Console.WriteLine("bot alive");
 
             _config = new Config();
-            Console.WriteLine(_config.Token);
-            Console.WriteLine(_config.Owner);
+            _client = new DiscordSocketClient();
+            _client.Log += m =>
+            {
+                Console.WriteLine(m);
+                return Task.CompletedTask;
+            };
+
+            await _client.LoginAsync(TokenType.Bot, _config.Token);
+            await _client.StartAsync();
 
             await Task.Delay(-1);
         }
