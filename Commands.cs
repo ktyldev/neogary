@@ -40,9 +40,21 @@ namespace neogary
             if (message.Author.Id == _client.CurrentUser.Id)
                 return;
 
-            if (message.Content.StartsWith(_prefix))
+            if (!message.Content.StartsWith(_prefix))
+                return;
+
+            // where the actual command starts, after the prefix
+            int argPos = _prefix.Length;
+
+            var context = new CommandContext(_client, message);
+            var result = await _commands.ExecuteAsync(
+                context, 
+                argPos, 
+                _services);
+
+            if (!result.IsSuccess)
             {
-                _log.Log(message);
+                _log.Log("command not completed", result.ErrorReason);
             }
         }
     }
