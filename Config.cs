@@ -10,6 +10,7 @@ namespace neogary
 
         public string Token { get; private set; }
         public string Owner { get; private set; }
+        public string Prefix { get; private set; }
 
         public Config()
         {
@@ -19,7 +20,8 @@ namespace neogary
                 File.WriteAllLines(CONFIG_PATH, new [] 
                 { 
                     "token=",
-                    "owner="
+                    "owner=",
+                    "prefix="
                 });
 
                 Console.WriteLine("Please fill in the config and run again :)");
@@ -29,6 +31,7 @@ namespace neogary
             string[] lines = File.ReadAllLines(CONFIG_PATH);            
             Token = GetConfigValue(lines, "token");
             Owner = GetConfigValue(lines, "owner");
+            Prefix = GetConfigValue(lines, "prefix");
 
             if (String.IsNullOrEmpty(Token) || String.IsNullOrEmpty(Owner))
             {

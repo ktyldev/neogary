@@ -22,7 +22,7 @@ namespace neogary
             _config = new Config();
 
             _client = new DiscordSocketClient();
-            _commands = new Commands("..", _client);
+            _commands = new Commands(_config.Prefix, _client);
 
             _client.Log += m =>
             {
