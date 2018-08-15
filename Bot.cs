@@ -13,13 +13,17 @@ namespace neogary
 
         private Config _config;
         private DiscordSocketClient _client;
+        private Commands _commands;
 
         public async Task MainAsync(string[] args)
         {
             Console.WriteLine("bot alive");
 
             _config = new Config();
+
             _client = new DiscordSocketClient();
+            _commands = new Commands("..", _client);
+
             _client.Log += m =>
             {
                 Console.WriteLine(m);
