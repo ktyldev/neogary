@@ -14,19 +14,20 @@ namespace neogary
         private Config _config;
         private DiscordSocketClient _client;
         private Commands _commands;
+        private ILogger _log;
 
         public async Task MainAsync(string[] args)
         {
-            Console.WriteLine("bot alive");
+            _log = new ConsoleLogger();
 
             _config = new Config();
 
             _client = new DiscordSocketClient();
-            _commands = new Commands(_config.Prefix, _client);
+            _commands = new Commands(_config.Prefix, _client, _log);
 
             _client.Log += m =>
             {
-                Console.WriteLine(m);
+                _log.Log(m.ToString());
                 return Task.CompletedTask;
             };
 

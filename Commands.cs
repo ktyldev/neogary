@@ -14,8 +14,9 @@ namespace neogary
         private DiscordSocketClient _client;
         private CommandService _commands;
         private IServiceProvider _services;
+        private ILogger _log;
 
-        public Commands(string commandPrefix, DiscordSocketClient client)
+        public Commands(string commandPrefix, DiscordSocketClient client, ILogger log)
         {
             _prefix = commandPrefix;
             
@@ -27,6 +28,8 @@ namespace neogary
 
             _services = new ServiceCollection()
                 .BuildServiceProvider();
+
+            _log = log;
         }
 
         private async Task HandleCommand(SocketMessage socketMessage)
@@ -39,7 +42,7 @@ namespace neogary
 
             if (message.Content.StartsWith(_prefix))
             {
-                Console.WriteLine("command received");
+                _log.Log(message);
             }
         }
     }
