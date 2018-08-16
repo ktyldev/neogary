@@ -15,6 +15,7 @@ namespace neogary
         private DiscordSocketClient _client;
         private Commands _commands;
         private ILogger _log;
+        private DataAccess _data;
 
         public async Task MainAsync(string[] args)
         {
@@ -24,6 +25,7 @@ namespace neogary
 
             _client = new DiscordSocketClient();
             _commands = new Commands(_config.Prefix, _client, _log);
+            _data = new DataAccess(_config.ConnectionString, _log);
 
             _client.Log += m =>
             {

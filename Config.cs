@@ -11,6 +11,7 @@ namespace neogary
         public string Token { get; private set; }
         public string Owner { get; private set; }
         public string Prefix { get; private set; }
+        public string ConnectionString { get; private set; }
 
         public Config()
         {
@@ -21,7 +22,8 @@ namespace neogary
                 { 
                     "token=",
                     "owner=",
-                    "prefix="
+                    "prefix=",
+                    "connectionstring"
                 });
 
                 Console.WriteLine("Please fill in the config and run again :)");
@@ -32,8 +34,17 @@ namespace neogary
             Token = GetConfigValue(lines, "token");
             Owner = GetConfigValue(lines, "owner");
             Prefix = GetConfigValue(lines, "prefix");
+            ConnectionString = GetConfigValue(lines, "connectionstring");
 
-            if (String.IsNullOrEmpty(Token) || String.IsNullOrEmpty(Owner))
+            var configValues = new []
+            {
+                Token, 
+                Owner, 
+                Prefix, 
+                ConnectionString
+            };
+
+            if (configValues.Any(s => s == ""))
             {
                 Console.WriteLine("Please fill in the config and run again :)");
                 Environment.Exit(1);
@@ -42,9 +53,12 @@ namespace neogary
 
         private string GetConfigValue(string[] lines, string key)
         {
-            return lines
+            return String.Join("=", 
+                lines
                 .Single(l => l.StartsWith(key))
-                .Split('=')[1];
+                .Split('=')
+                .Skip(1));
+;
         }
     }
 }
