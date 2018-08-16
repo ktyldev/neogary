@@ -6,10 +6,18 @@ namespace neogary
 {
     public class Admin : ModuleBase
     {
+        private ILogService _log;
+
+        public Admin(ILogService log)
+        {
+            _log = log;
+        }
+
         [Command("ping")]
         [Remarks("Replies with pong")]
         public async Task Ping()
         {
+            _log.Log("ping");
             await ReplyAsync("Pong");
         }
 

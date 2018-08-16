@@ -3,7 +3,7 @@ using Discord.WebSocket;
 
 namespace neogary 
 {
-    public class ConsoleLogger : ILogger
+    public class ConsoleLogger : ILogService
     {
         private const string DATE_FORMAT = "yyyy/MM/dd HH:mm:ss";
 

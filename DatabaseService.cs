@@ -1,12 +1,13 @@
+using System;
 using MySql.Data.MySqlClient;
 
 namespace neogary
 {
-    public class DataAccess
+    public class DatabaseService 
     {
-        private ILogger _log;
+        private ILogService _log;
 
-        public DataAccess(string connectionString, ILogger log)
+        public DatabaseService(string connectionString, ILogService log)
         {
             _log = log;
 

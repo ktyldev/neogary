@@ -1,6 +1,7 @@
 using Discord.WebSocket;
 using Discord.Commands;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -14,22 +15,19 @@ namespace neogary
         private DiscordSocketClient _client;
         private CommandService _commands;
         private IServiceProvider _services;
-        private ILogger _log;
+        private ILogService _log;
 
-        public Commands(string commandPrefix, DiscordSocketClient client, ILogger log)
+        public Commands(string commandPrefix, DiscordSocketClient client, IServiceProvider services)
         {
             _prefix = commandPrefix;
+            _services = services;
+            _log = (ILogService)services.GetService(typeof(ILogService));
             
             _client = client;
             _client.MessageReceived += HandleCommand;
 
             _commands = new CommandService();
             _commands.AddModulesAsync(Assembly.GetEntryAssembly());
-
-            _services = new ServiceCollection()
-                .BuildServiceProvider();
-
-            _log = log;
         }
 
         private async Task HandleCommand(SocketMessage socketMessage)
@@ -54,7 +52,8 @@ namespace neogary
 
             if (!result.IsSuccess)
             {
-                _log.Log("command not completed", result.ErrorReason);
+                Console.WriteLine(result.ErrorReason);
+                //_log.Log("command not completed", result.ErrorReason);
             }
         }
     }

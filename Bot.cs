@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using System.Linq;
 using Discord;
 using Discord.WebSocket;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace neogary
 {
@@ -14,18 +16,23 @@ namespace neogary
         private Config _config;
         private DiscordSocketClient _client;
         private Commands _commands;
-        private ILogger _log;
-        private DataAccess _data;
+        private ILogService _log;
+        private DatabaseService _data;
 
         public async Task MainAsync(string[] args)
         {
-            _log = new ConsoleLogger();
+            var sc = new ServiceCollection();
+            sc.TryAddSingleton<ILogService, ConsoleLogger>();
+
+            var services = sc.BuildServiceProvider();
+
+            _log = (ILogService)services.GetService(typeof(ILogService));
 
             _config = new Config();
 
             _client = new DiscordSocketClient();
-            _commands = new Commands(_config.Prefix, _client, _log);
-            _data = new DataAccess(_config.ConnectionString, _log);
+            _commands = new Commands(_config.Prefix, _client, services);
+            _data = new DatabaseService(_config.ConnectionString, _log);
 
             _client.Log += m =>
             {
