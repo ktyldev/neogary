@@ -28,7 +28,7 @@ namespace neogary
             _log = new ConsoleLogger();
             _data = new DatabaseService(_config.ConnectionString, _log);
 
-            StartServices();
+            RegisterServices();
 
             _client = new DiscordSocketClient();
             _commands = new Commands(_config.Prefix, _client, _services);
@@ -45,11 +45,12 @@ namespace neogary
             await Task.Delay(-1);
         }
 
-        private void StartServices()
+        private void RegisterServices()
         {
             var sc = new ServiceCollection();
-            sc.AddSingleton(_log);
+            sc.AddSingleton<ILogService>(_log);
             sc.AddSingleton<IDataService>(_data);
+            sc.AddSingleton(_config);
 
             _services = sc.BuildServiceProvider();
         }
