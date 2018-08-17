@@ -23,15 +23,15 @@ namespace neogary
 
         public async Task MainAsync(string[] args)
         {
-            StartServices();
-
-            _log = _services.GetService<ILogService>();
-
             _config = new Config();
+
+            _log = new ConsoleLogger();
+            _data = new DatabaseService(_config.ConnectionString, _log);
+
+            StartServices();
 
             _client = new DiscordSocketClient();
             _commands = new Commands(_config.Prefix, _client, _services);
-            _data = new DatabaseService(_config.ConnectionString, _log);
 
             _client.Log += m =>
             {
@@ -48,7 +48,8 @@ namespace neogary
         private void StartServices()
         {
             var sc = new ServiceCollection();
-            sc.AddSingleton<ILogService, ConsoleLogger>();
+            sc.AddSingleton(_log);
+            sc.AddSingleton<IDataService>(_data);
 
             _services = sc.BuildServiceProvider();
         }
