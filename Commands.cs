@@ -3,6 +3,7 @@ using Discord.Commands;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
+using System.Linq;
 using System.Data;
 using System.Collections.Generic;
 using System.Reflection;
@@ -19,11 +20,17 @@ namespace neogary
         private ILogService _log;
         private IDataService _data;
 
+        struct Command
+        {
+            public string Name;
+            public string Description;
+        }
+
         public Commands(string commandPrefix, DiscordSocketClient client, IServiceProvider services)
         {
             _prefix = commandPrefix;
             _services = services;
-            _log = (ILogService)services.GetService(typeof(ILogService));
+            _log = services.GetService<ILogService>();
             _data = services.GetService<IDataService>();
             
             _client = client;
@@ -37,10 +44,54 @@ namespace neogary
 
         private void UpdateCommandsInDb()
         {
+            var dbCommands = new List<Command>(); 
             _data.Find(
                 "botcommand", 
                 "1=1", 
-                r => _log.Log(r.GetString(1) + "\t" + r.GetString(2)));
+                r => dbCommands
+                    .Add(new Command
+                    { 
+                        Name = r.GetString(1),
+                        Description = r.GetString(2)
+                    }));
+
+            var moduleCommands = _commands.Commands
+                .Select(c => new Command
+                {
+                    Name = c.Name,
+                    Description = c.Remarks
+                })
+                .ToList();
+
+            var allCommands = dbCommands.Concat(moduleCommands);
+
+            int updated = 0;
+            foreach(var c in allCommands)
+            {
+                bool inModules = moduleCommands.Contains(c);
+                bool inDb = dbCommands.Contains(c);
+
+                // do nothing - command is already in DB
+                if (inModules && inDb)
+                    continue;
+
+                if (inDb && !inModules)
+                {
+                    _data.Remove(
+                        "botcommand",
+                        String.Format("name = '{0}'", c.Name));
+                    updated++;
+                }
+                else if (!inDb && inModules)
+                {
+                    _data.Insert(
+                        "botcommand",
+                        "name, description",
+                        String.Format("'{0}','{1}'", c.Name, c.Description));
+                    updated++;
+                }
+            }
+            _log.Log(String.Format("updated {0} commands in DB", updated));
         }
 
         private async Task HandleCommand(SocketMessage socketMessage)

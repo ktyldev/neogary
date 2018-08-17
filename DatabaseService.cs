@@ -57,12 +57,48 @@ namespace neogary
 
         public int Insert(string table, string columns, string values)
         {
-            throw new Exception();
+            var sql = String.Format(
+                "insert into {0} ({1}) values ({2})",
+                table,
+                columns,
+                values);
+
+            int result = -1;
+            OpenConnection(c =>
+            {
+                var command = new MySqlCommand(sql, c);
+                result = command.ExecuteNonQuery(); 
+            });
+
+            if (result == -1)
+                throw new Exception();
+
+            return result;
         }
 
         public int Update(string table, string setValues, string condition)
         {
             throw new Exception();
+        }
+
+        public int Remove(string table, string condition)
+        {
+            var sql = String.Format(
+                "delete from {0} where {1}",
+                table,
+                condition);
+
+            int result = -1;
+            OpenConnection(c =>
+            {
+                var command = new MySqlCommand(sql, c);
+                result = command.ExecuteNonQuery();
+            });
+
+            if (result == -1)
+                throw new Exception();
+
+            return result;
         }
     }
 }
