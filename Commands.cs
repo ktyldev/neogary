@@ -108,16 +108,22 @@ namespace neogary
             // where the actual command starts, after the prefix
             int argPos = _prefix.Length;
 
-            var context = new CommandContext(_client, message);
+            _log.Log(
+                String.Format(
+                    "{0}:\t{1}", 
+                    message.Author.Username, 
+                    message.Content));
+
             var result = await _commands.ExecuteAsync(
-                context, 
+                new CommandContext(_client, message), 
                 argPos, 
                 _services);
-
             if (!result.IsSuccess)
             {
-                Console.WriteLine(result.ErrorReason);
-                //_log.Log("command not completed", result.ErrorReason);
+                _log.Log(
+                    String.Format(
+                        "command failed:\t{0}", 
+                        result.ErrorReason));
             }
         }
     }
