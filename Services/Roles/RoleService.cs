@@ -75,5 +75,26 @@ namespace neogary
             }
             _log.Log(String.Format("updated {0} roles in DB", updated));
         }
+
+        public bool IsRoleAssignable(string roleName)
+        {
+            var guild = _client
+                .Guilds
+                .Single();
+
+            var role = guild
+                .Roles
+                .SingleOrDefault(r => r.Name.ToLower() == roleName.ToLower());
+            if (role == null)
+                return false; // role doesn't exist
+
+            bool result = false;
+            _data.Find(
+                "role",
+                String.Format("discordid = '{0}'", role.Id),
+                r => result = r.GetBoolean(2));
+
+            return result;
+        }
     }
 }
