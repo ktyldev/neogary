@@ -78,6 +78,23 @@ namespace neogary
                     assignable));
         }
 
+        [Command("rolesinfo")]
+        [Remarks("get which roles are assignable")]
+        public Task RolesInfo()
+        {
+            string result = "currently assignable roles:\n";
+            
+            _client.Guilds
+                .Single()
+                .Roles
+                .ToList()
+                .Where(r => _roles.IsRoleAssignable(r.Id.ToString()))
+                .ToList()
+                .ForEach(r => result += "`" + r.Name + "`\n");
+
+            return ReplyAsync(result);
+        }
+
         private IRole GetRole(string roleName)
         {
             var role = _client
