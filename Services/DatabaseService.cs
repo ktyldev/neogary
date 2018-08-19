@@ -36,13 +36,14 @@ namespace neogary
             conn.Close();
         }
 
-        public void Find(string table, string condition, Action<IDataRecord> readRecord)
+        public int Find(string table, string condition, Action<IDataRecord> readRecord)
         {
             var query = String.Format(
                 "select * from {0} where {1}", 
                 table, 
                 condition);
 
+            int found = 0;
             OpenConnection(c =>
             {
                 var command = new MySqlCommand(query, c);
@@ -50,9 +51,12 @@ namespace neogary
 
                 while (reader.Read())
                 {
+                    found++;
                     readRecord((IDataRecord)reader);
                 }
             });
+
+            return found;
         }
 
         public int Insert(string table, string columns, string values)
@@ -78,7 +82,18 @@ namespace neogary
 
         public int Update(string table, string setValues, string condition)
         {
-            throw new Exception();
+            var sql = String.Format(
+                "update {0} set {1} where {2}",
+                table,
+                setValues,
+                condition);
+
+            int result = -1;
+            OpenConnection(c => 
+                result = new MySqlCommand(sql, c)
+                    .ExecuteNonQuery());
+
+            return result;
         }
 
         public int Remove(string table, string condition)

@@ -86,5 +86,18 @@ namespace neogary
 
             return result;
         }
+
+        public void SetRoleAssignable(string roleId, bool assignable)
+        {
+            int updated = _data.Update(
+                "role",
+                String.Format(
+                    "isassignable={0}", 
+                    assignable ? "true" : "false"),
+                String.Format("discordid='{0}'", roleId));
+
+            if (updated != 1)
+                throw new Exception();
+        }
     }
 }
