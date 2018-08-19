@@ -1,5 +1,6 @@
 using Discord.Commands;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace neogary
@@ -40,7 +41,32 @@ namespace neogary
         [Remarks("list the configured role permissions")]
         public Task GetRolePermissions()
         {
-            throw new Exception();        
+            string result = "```\n";
+
+            var serverRoles = _roles.All;
+            int maxNameLength = serverRoles
+                .Select(r => r.Name)
+                .Max(s => s.Length);
+
+            _data.Find(
+                "role",
+                "1=1",
+                r =>
+                {
+                    string name = serverRoles
+                        .Single(sr => sr.Id.ToString() == r.GetString(1))
+                        .Name
+                        .PadRight(maxNameLength);            
+                    
+                    result += String.Format(
+                        "{0}\t{1}\n",
+                        name,
+                        r.GetInt32(3));
+                });
+
+            result += "```";
+
+            return ReplyAsync(result);
         }
 
         [Command("permissioncommand")]

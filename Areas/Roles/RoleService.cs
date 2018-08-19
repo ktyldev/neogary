@@ -104,6 +104,11 @@ namespace neogary
                 throw new Exception();
         }
 
+        public IEnumerable<IRole> All => _client
+            .Guilds
+            .Single()
+            .Roles;
+
         public IRole GetRole(string roleName)
         {
             return _client
