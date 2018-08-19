@@ -1,6 +1,7 @@
 using Discord.Commands;
 using System;
 using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace neogary
@@ -94,7 +95,35 @@ namespace neogary
         [Remarks("list the configured command permissions")]
         public Task GetCommandPermissions()
         {
-            throw new Exception();        
+            string result = "```\n";
+
+            List<string> names = new List<string>();
+            List<int> perms = new List<int>();
+            _data.Find(
+                "botcommand",
+                "1=1",
+                r =>
+                {
+                    names.Add(r.GetString(1));
+                    perms.Add(r.GetInt32(3));
+                });
+
+            var maxNameLength = names
+                .Select(s => s.Length)
+                .Max();
+            
+            names = names
+                .Select(s => s.PadRight(maxNameLength))
+                .ToList();
+
+            for (int i = 0; i < names.Count; i++)
+            {
+                result += String.Format("{0}\t{1}\n", names[i], perms[i]);
+            }
+
+            result += "```";
+
+            return ReplyAsync(result);
         }
     }
 }
