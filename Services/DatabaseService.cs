@@ -15,7 +15,18 @@ namespace neogary
             _connectionString = connectionString;
 
             // test the connection
-            OpenConnection(_ => _log.Log("DB connection OK"));
+            bool connectionOk = false;
+            OpenConnection(_ =>
+            {
+                _log.Log("DB connection OK");
+                connectionOk = true;    
+            });
+
+            if (!connectionOk)
+            {
+                _log.Log("Unable to connect to database, exiting...");
+                Environment.Exit(1);
+            }
         }
 
         private void OpenConnection(Action<MySqlConnection> useConn)
