@@ -43,6 +43,7 @@ namespace neogary
 
             var serverRoles = guild
                 .Roles
+                .Where(r => r.Name.ToLower() != "@everyone")
                 .Select(r => r.Id.ToString());
 
             var allRoles = dbRoles.Concat(serverRoles);
