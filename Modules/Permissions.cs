@@ -73,7 +73,21 @@ namespace neogary
         [Remarks("set the permission tier for a command")]
         public Task SetCommandPermission(string commandName, int tier)
         {
-            throw new Exception();        
+            bool exists = _data.Find(
+                "botcommand",
+                String.Format("name='{0}'", commandName),
+                _ => { }) == 1;
+            if (!exists)
+                return ReplyAsync("command does not exist");
+
+            int updated = _data.Update(
+                "botcommand",
+                "permtier=" + tier,
+                String.Format("name='{0}'", commandName));
+            if (updated == 0)
+                throw new Exception("no records updated");
+
+            return ReplyAsync("updated command permissions");
         }
 
         [Command("permissioncommandlist")]
