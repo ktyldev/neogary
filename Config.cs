@@ -23,7 +23,7 @@ namespace neogary
                     "token=",
                     "owner=",
                     "prefix=",
-                    "connectionstring"
+                    "connectionstring="
                 });
 
                 Console.WriteLine("Please fill in the config and run again :)");
