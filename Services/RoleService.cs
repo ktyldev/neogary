@@ -69,8 +69,8 @@ namespace neogary
                 {
                     _data.Insert(
                         "role",
-                        "discordid",
-                        String.Format("'{0}'", r));
+                        "discordid, isassignable",
+                        String.Format("'{0}', true", r));
                     updated++;
                 }
             }
