@@ -20,6 +20,8 @@ namespace neogary
         private ILogService _log;
         private IDataService _data;
 
+        private readonly int _defaultPermTier = -1;
+
         struct Command
         {
             public string Name;
@@ -86,8 +88,12 @@ namespace neogary
                 {
                     _data.Insert(
                         "botcommand",
-                        "name, description",
-                        String.Format("'{0}','{1}'", c.Name, c.Description));
+                        "name, description, permtier",
+                        String.Format(
+                            "'{0}','{1}', {2}", 
+                            c.Name, 
+                            c.Description, 
+                            _defaultPermTier));
                     updated++;
                 }
             }

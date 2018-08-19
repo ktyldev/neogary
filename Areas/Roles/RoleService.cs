@@ -1,3 +1,4 @@
+using Discord;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -12,6 +13,8 @@ namespace neogary
         private IDataService _data;
         private ILogService _log;
         private DiscordSocketClient _client;
+
+        private readonly int _defaultPermTier = -1;
 
         public RoleService(IDataService data, ILogService log, DiscordSocketClient client)
         {
@@ -69,8 +72,8 @@ namespace neogary
                 {
                     _data.Insert(
                         "role",
-                        "discordid, isassignable",
-                        String.Format("'{0}', true", r));
+                        "discordid, isassignable, permtier",
+                        String.Format("'{0}', true, {1}", r, _defaultPermTier));
                     updated++;
                 }
             }
@@ -99,6 +102,16 @@ namespace neogary
 
             if (updated != 1)
                 throw new Exception();
+        }
+
+        public IRole GetRole(string roleName)
+        {
+            return _client
+                .Guilds
+                .Single()
+                .Roles
+                .SingleOrDefault(r => 
+                    r.Name.ToLower() == roleName.ToLower());
         }
     }
 }

@@ -101,8 +101,10 @@ namespace neogary
 
             int result = -1;
             OpenConnection(c => 
-                result = new MySqlCommand(sql, c)
-                    .ExecuteNonQuery());
+            {
+                var command = new MySqlCommand(sql, c);
+                result = command.ExecuteNonQuery();
+            });
 
             return result;
         }

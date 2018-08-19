@@ -7,47 +7,54 @@ namespace neogary
     public class Permissions : ModuleBase
     {
         private IDataService _data;
+        private RoleService _roles;
+        private ILogService _log;
 
-        public Permissions(IDataService data)
+        public Permissions(IDataService data, RoleService roles, ILogService log)
         {
             _data = data;
+            _roles = roles;
+            _log = log;
         }
 
-        [Command("permissionnew")]
-        [Remarks("create a new permission group")]
-        public Task New(string name, int tier)
+        [Command("permissionrole")]
+        [Remarks("set the permission tier for a role")]
+        public Task SetRolePermission(string roleName, int tier)
         {
-            if (Exists(name))
-                return ReplyAsync("group already exists");
+            var role = _roles.GetRole(roleName);
+            if (role == null)
+                return ReplyAsync("role does not exist");
 
-            int updated = _data.Insert(
-                "permission",
-                "name, tier",
-                String.Format("'{0}', {1}", name, tier));
+            int updated = _data.Update(
+                "role",
+                "permtier=" + tier,
+                String.Format("discordid='{0}'", role.Id.ToString()));
 
-            if (updated != 1)
-                throw new Exception();
+            if (updated == 0)
+                throw new Exception("no records updated");
 
-            return ReplyAsync(
-                String.Format(
-                    "added permission group {0} tier {1}", 
-                    name, 
-                    tier));
+            return ReplyAsync("updated role permissions");
         }
 
-        [Command("permissionlist")]
-        [Remarks("get a list of the permission tiers")]
-        public Task List()
+        [Command("permissionrolelist")]
+        [Remarks("list the configured role permissions")]
+        public Task GetRolePermissions()
         {
-            throw new Exception();
+            throw new Exception();        
         }
 
-        private bool Exists(string name)
+        [Command("permissioncommand")]
+        [Remarks("set the permission tier for a command")]
+        public Task SetCommandPermission(string commandName, int tier)
         {
-            return _data.Find(
-                "permission",
-                String.Format("name like '{0}'", name),
-                _ => { }) > 0;
+            throw new Exception();        
+        }
+
+        [Command("permissioncommandlist")]
+        [Remarks("list the configured command permissions")]
+        public Task GetCommandPermissions()
+        {
+            throw new Exception();        
         }
     }
 }
