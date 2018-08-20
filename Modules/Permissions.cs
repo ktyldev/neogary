@@ -1,3 +1,4 @@
+using Discord;
 using Discord.Commands;
 using System;
 using System.Linq;
@@ -42,12 +43,9 @@ namespace neogary
         [Remarks("list the configured role permissions")]
         public Task GetRolePermissions()
         {
-            string result = "```\n";
+            string result = "```md\n# Role Permission Tiers\n\n";
 
             var serverRoles = _roles.All;
-            int maxNameLength = serverRoles
-                .Select(r => r.Name)
-                .Max(s => s.Length);
 
             _data.Find(
                 "role",
@@ -56,18 +54,15 @@ namespace neogary
                 {
                     string name = serverRoles
                         .Single(sr => sr.Id.ToString() == r.GetString(1))
-                        .Name
-                        .PadRight(maxNameLength);            
+                        .Name;          
                     
                     result += String.Format(
-                        "{0}\t{1}\n",
+                        "{0, -25}|{1, 10}\n",
                         name,
                         r.GetInt32(3));
                 });
 
-            result += "```";
-
-            return ReplyAsync(result);
+            return ReplyAsync(result + "```");
         }
 
         [Command("permissioncommand")]
@@ -95,7 +90,7 @@ namespace neogary
         [Remarks("list the configured command permissions")]
         public Task GetCommandPermissions()
         {
-            string result = "```\n";
+            string result = "```md\n# Command Permission Tiers\n\n";
 
             List<string> names = new List<string>();
             List<int> perms = new List<int>();
@@ -107,23 +102,15 @@ namespace neogary
                     names.Add(r.GetString(1));
                     perms.Add(r.GetInt32(3));
                 });
-
-            var maxNameLength = names
-                .Select(s => s.Length)
-                .Max();
             
-            names = names
-                .Select(s => s.PadRight(maxNameLength))
-                .ToList();
+            names = names.ToList();
 
             for (int i = 0; i < names.Count; i++)
             {
-                result += String.Format("{0}\t{1}\n", names[i], perms[i]);
+                result += String.Format("{0, -25}|{1, 10}\n", names[i], perms[i]);
             }
 
-            result += "```";
-
-            return ReplyAsync(result);
+            return ReplyAsync(result + "```");
         }
     }
 }
