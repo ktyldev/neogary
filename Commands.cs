@@ -19,6 +19,7 @@ namespace neogary
         private IServiceProvider _services;
         private ILogService _log;
         private IDataService _data;
+        private PermissionService _perms;
 
         private readonly int _defaultPermTier = -1;
 
@@ -34,6 +35,7 @@ namespace neogary
             _services = services;
             _log = services.GetService<ILogService>();
             _data = services.GetService<IDataService>();
+            _perms = services.GetService<PermissionService>();
             
             _client = client;
             _client.MessageReceived += HandleCommand;
@@ -111,15 +113,17 @@ namespace neogary
             if (!message.Content.StartsWith(_prefix))
                 return;
 
-            // where the actual command starts, after the prefix
-            int argPos = _prefix.Length;
-
             _log.Log(
                 String.Format(
                     "{0}:\t{1}", 
                     message.Author.Username, 
                     message.Content));
+            
+            if (!CheckPermission(message))
+                return;
 
+            // where the actual command starts, after the prefix
+            int argPos = _prefix.Length;
             var result = await _commands.ExecuteAsync(
                 new CommandContext(_client, message), 
                 argPos, 
@@ -130,7 +134,34 @@ namespace neogary
                     String.Format(
                         "command failed:\t{0}", 
                         result.ErrorReason));
+            } 
+        }
+
+        private bool CheckPermission(SocketUserMessage message)
+        {
+            var author = (SocketGuildUser)message.Author;
+            string[] roleIds = author
+                .Roles
+                .Select(r => r.Id.ToString())
+                .ToArray();
+
+            var commandName = message
+                .Content
+                .Split(' ')
+                .First()
+                .Substring(_prefix.Length);
+
+            bool result = false;
+            foreach (var role in author.Roles)
+            {
+                string roleId = role.Id.ToString(); 
+                result = _perms.HasPermission(roleId, commandName);
+
+                if (result)
+                    break;
             }
+
+            return result;
         }
     }
 }

@@ -55,6 +55,7 @@ namespace neogary
             sc.AddSingleton(_config);
             sc.AddSingleton(_client);
             sc.AddSingleton(_roles);
+            sc.AddSingleton(new PermissionService(_log, _data));
 
             _services = sc.BuildServiceProvider();
         }
