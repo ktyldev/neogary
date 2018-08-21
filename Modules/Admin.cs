@@ -1,4 +1,3 @@
-using Discord.WebSocket;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -62,6 +61,15 @@ namespace neogary
             var dmChannel = await user.GetOrCreateDMChannelAsync();
 
             await dmChannel.SendMessageAsync("", false, builder);
+        }
+
+        [Command("stop")]
+        [Remarks("shutdown bot")]
+        public Task Stop()
+        {
+            _log.Log("Stopping...");
+            Environment.Exit(0);
+            return Task.CompletedTask;
         }
     }
 }
