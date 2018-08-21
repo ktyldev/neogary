@@ -37,7 +37,6 @@ namespace neogary
         public async Task Help()
         {
             var user = (SocketGuildUser)Context.User;
-            _log.Log(user.Roles.ToString());
             var result = "";
 
             List<string> modules = new List<string>();
