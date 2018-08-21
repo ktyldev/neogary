@@ -1,3 +1,4 @@
+using Discord.WebSocket;
 using Discord;
 using Discord.Commands;
 using System;
@@ -7,12 +8,14 @@ namespace neogary
 {
     public class Admin : ModuleBase
     {
+        private DiscordSocketClient _client;
         private ILogService _log;
         private IDataService _data;
 
-        public Admin(ILogService log, IDataService data)
+        public Admin(ILogService log, DiscordSocketClient client, IDataService data)
         {
             _log = log;
+            _client = client;
             _data = data;
         }
 
@@ -21,7 +24,7 @@ namespace neogary
         public async Task Ping()
         {
             _log.Log("ping");
-            await ReplyAsync("Pong");
+            await ReplyAsync(String.Format("Pong! Latency is {0}ms", _client.Latency));
         }
 
         [Command("help")]
