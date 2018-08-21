@@ -2,7 +2,9 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace neogary
 {
@@ -38,6 +40,9 @@ namespace neogary
             _log.Log(user.Roles.ToString());
             var result = "";
 
+            List<string> modules = new List<string>();
+            List<string> results = new List<string>();
+
             _data.Find(
                 "botcommand",
                 "1=1",
@@ -47,16 +52,30 @@ namespace neogary
                     if (!_perms.CheckPermission(user, name))
                         return;
 
-                    result += String.Format(
+                    string module = r.GetString(4);
+
+                    var index = modules.FindIndex(str => str == module);
+
+                    if (index == -1)
+                    {
+                        index = modules.Count;
+                        modules.Add(module);
+                        results.Add("");
+                    }
+
+                    results[index] += String.Format(
                         "`{0}` | {1}\n",
                         name,
                         r.GetString(2));
                 });
             
             var builder = new EmbedBuilder()
-                .WithTitle("Help")
-                .WithDescription(result)
                 .WithCurrentTimestamp();
+
+            for (int i = 0; i < results.Count; i++)
+            {
+                builder.AddField(modules[i], results[i]);
+            }
 
             var dmChannel = await user.GetOrCreateDMChannelAsync();
 
