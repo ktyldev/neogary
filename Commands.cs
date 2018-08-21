@@ -72,22 +72,38 @@ namespace neogary
 
             var allCommands = dbCommands.Concat(moduleCommands);
 
-            int updated = 0;
+            // keep track of the updated commands so as not to update them twice
+            List<string> updatedCommands = new List<string>();
             foreach(var c in allCommands)
             {
-                bool inModules = moduleCommands.Contains(c);
-                bool inDb = dbCommands.Contains(c);
-
-                // do nothing - command is already in DB
-                if (inModules && inDb)
+                if (updatedCommands.Contains(c.Name))
                     continue;
+
+                bool inModules = moduleCommands.Any(cmd => cmd.Name == c.Name);
+                bool inDb = dbCommands.Any(cmd => cmd.Name == c.Name);
+
+                if (inModules && inDb)
+                {
+                    // compare descriptions, update database with module version
+                    var dbCmd = dbCommands.Single(cmd => cmd.Name == c.Name);
+                    var mdCmd = moduleCommands.Single(cmd => cmd.Name == c.Name);
+
+                    if (dbCmd.Description != mdCmd.Description)
+                    {
+                        _data.Update(
+                            "botcommand",
+                            String.Format("description='{0}'", mdCmd.Description),
+                            String.Format("name='{0}'", c.Name));
+                        updatedCommands.Add(c.Name);
+                    }
+                }
 
                 if (inDb && !inModules)
                 {
                     _data.Remove(
                         "botcommand",
                         String.Format("name = '{0}'", c.Name));
-                    updated++;
+                    updatedCommands.Add(c.Name);
                 }
                 else if (!inDb && inModules)
                 {
@@ -100,10 +116,14 @@ namespace neogary
                             c.Description, 
                             _defaultPermTier,
                             c.Module));
-                    updated++;
+                    updatedCommands.Add(c.Name);
                 }
             }
-            _log.Log(String.Format("updated {0} commands in DB", updated));
+
+            _log.Log(
+                String.Format(
+                    "updated {0} commands in DB", 
+                    updatedCommands.Count));
         }
 
         private async Task HandleCommand(SocketMessage socketMessage)
