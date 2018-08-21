@@ -27,6 +27,7 @@ namespace neogary
         {
             public string Name;
             public string Description;
+            public string Module;
         }
 
         public Commands(string commandPrefix, DiscordSocketClient client, IServiceProvider services)
@@ -56,14 +57,16 @@ namespace neogary
                     .Add(new Command
                     { 
                         Name = r.GetString(1),
-                        Description = r.GetString(2)
+                        Description = r.GetString(2),
+                        Module = r.GetString(4)
                     }));
 
             var moduleCommands = _commands.Commands
                 .Select(c => new Command
                 {
                     Name = c.Name,
-                    Description = c.Remarks
+                    Description = c.Remarks,
+                    Module = c.Module.Name
                 })
                 .ToList();
 
@@ -90,12 +93,13 @@ namespace neogary
                 {
                     _data.Insert(
                         "botcommand",
-                        "name, description, permtier",
+                        "name, description, permtier, module",
                         String.Format(
-                            "'{0}','{1}', {2}", 
+                            "'{0}','{1}', {2}, '{3}'", 
                             c.Name, 
                             c.Description, 
-                            _defaultPermTier));
+                            _defaultPermTier,
+                            c.Module));
                     updated++;
                 }
             }
