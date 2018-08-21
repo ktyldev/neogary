@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using Discord.WebSocket;
 
 namespace neogary
 {
@@ -11,6 +13,14 @@ namespace neogary
         {
             _data = data; 
             _log = log;
+        }
+
+        public bool CheckPermission(SocketGuildUser user, string commandName)
+        {
+            return user
+                .Roles
+                .Select(r => r.Id.ToString())
+                .Any(id => HasPermission(id, commandName));
         }
 
         public bool HasPermission(string roleId, string commandName)

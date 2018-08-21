@@ -140,28 +140,13 @@ namespace neogary
         private bool CheckPermission(SocketUserMessage message)
         {
             var author = (SocketGuildUser)message.Author;
-            string[] roleIds = author
-                .Roles
-                .Select(r => r.Id.ToString())
-                .ToArray();
-
             var commandName = message
                 .Content
                 .Split(' ')
                 .First()
                 .Substring(_prefix.Length);
 
-            bool result = false;
-            foreach (var role in author.Roles)
-            {
-                string roleId = role.Id.ToString(); 
-                result = _perms.HasPermission(roleId, commandName);
-
-                if (result)
-                    break;
-            }
-
-            return result;
+            return _perms.CheckPermission(author, commandName);
         }
     }
 }
