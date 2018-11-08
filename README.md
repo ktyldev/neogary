@@ -15,3 +15,7 @@ Head over to [the database repo](https://github.com/monodokimes/neogary-db) and 
 Create a Discord application for the bot [here](https://discordapp.com/developers) and invite the bot to your server. Currently the bot can only be invited to one server at a time.
 
 Fill out the configuration file and run the bot.
+
+# Known Issues
+
+* restart required to pick up new roles
